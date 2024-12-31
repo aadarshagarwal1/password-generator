@@ -1,118 +1,252 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
+  Alert,
+  Appearance,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
+  TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
+import React, {useState} from 'react';
+import Clipboard from '@react-native-clipboard/clipboard';
+import BouncyCheckBox from 'react-native-bouncy-checkbox';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const returnColor = () => {
+  if (Appearance.getColorScheme() === 'dark') return 'white';
+  else return 'black';
+};
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const generateRandomSubstring = (poolString: string, length: number) => {
+  let substring = '';
+  for (let i = 0; i < length; i += 1) {
+    const index = Math.floor(Math.random() * (poolString.length - +1));
+    substring += poolString.charAt(index);
+  }
+  return substring;
+};
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+export default function App() {
+  const generatePassword = () => {
+    let poolString = '';
+    if (!lowercase && !uppercase && !numbers && !specialCharacters) {
+      poolString = 'abcdefghijklmnopqrstuvwxyz';
+    } else {
+      const lowercasePoolString = lowercase ? 'abcdefghijklmnopqrstuvwxyz' : '';
+      const uppercasePoolString = uppercase ? 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' : '';
+      const numbersPoolString = numbers ? '0123456789' : '';
+      const specialCharactersPoolString = specialCharacters
+        ? '!"#$%&\'()*+-/::;<=>?@[\\]^_{|}~'
+        : '';
+      poolString =
+        lowercasePoolString +
+        uppercasePoolString +
+        numbersPoolString +
+        specialCharactersPoolString;
+    }
+    let passwordLength = 8;
+    if (!length.length) {
+      setLength('8');
+    } else {
+      passwordLength = Number(length);
+    }
+    const password = generateRandomSubstring(
+      poolString,
+      Number(passwordLength),
+    );
+    return password;
   };
 
+  const updatePassword = (newPassword: string) => {
+    setPassword(newPassword);
+  };
+
+  const HandleLongPress = () => {
+    Clipboard.setString(password);
+  };
+  const [password, setPassword] = useState('');
+  const [length, setLength] = useState('');
+  const [lowercase, setLowercase] = useState(true);
+  const [uppercase, setUppercase] = useState(true);
+  const [numbers, setnumbers] = useState(false);
+  const [specialCharacters, setSpecialCharacters] = useState(false);
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    <ScrollView keyboardShouldPersistTaps="handled">
+      <SafeAreaView>
+        <Text style={[styles.headingText, {color: returnColor()}]}>
+          Password Generator
+        </Text>
+        <View>
+          <View style={styles.inputField}>
+            <Text style={[{color: returnColor(), fontSize: 20}]}>
+              Password Length
+            </Text>
+            <TextInput
+              placeholder="Eg. 8"
+              value={length}
+              onChange={e => setLength(e.nativeEvent.text)}
+              keyboardType="numeric"
+              onSubmitEditing={() => {
+                updatePassword(generatePassword());
+              }}
+              style={styles.passwordLengthInputBox}></TextInput>
+          </View>
+          <View style={styles.inputField}>
+            <Text style={[{color: returnColor(), fontSize: 20}]}>
+              Include Lowercase Letters
+            </Text>
+            <BouncyCheckBox
+              isChecked={lowercase}
+              onPress={() => setLowercase(val => !val)}
+              fillColor="grey"
+              disableText={true}
+            />
+          </View>
+          <View style={styles.inputField}>
+            <Text style={[{color: returnColor(), fontSize: 20}]}>
+              Include Uppercase Letters
+            </Text>
+            <BouncyCheckBox
+              isChecked={uppercase}
+              onPress={() => setUppercase(val => !val)}
+              fillColor="grey"
+              disableText={true}
+            />
+          </View>
+          <View style={styles.inputField}>
+            <Text style={[{color: returnColor(), fontSize: 20}]}>
+              Include Numbers
+            </Text>
+            <BouncyCheckBox
+              isChecked={numbers}
+              onPress={() => setnumbers(val => !val)}
+              fillColor="grey"
+              disableText={true}
+            />
+          </View>
+          <View style={styles.inputField}>
+            <Text style={[{color: returnColor(), fontSize: 20}]}>
+              Include Special Characters
+            </Text>
+            <BouncyCheckBox
+              isChecked={specialCharacters}
+              onPress={() => setSpecialCharacters(val => !val)}
+              fillColor="grey"
+              disableText={true}
+            />
+          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+        <View style={styles.buttons}>
+          <TouchableOpacity
+            onPress={() => {
+              updatePassword(generatePassword());
+            }}>
+            <View style={styles.generateButton}>
+              <Text style={styles.buttonText}>GENERATE</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              updatePassword('');
+              setLength('');
+              setLowercase(true);
+              setUppercase(true);
+              setnumbers(false);
+              setSpecialCharacters(false);
+            }}>
+            <View style={styles.resetButton}>
+              <Text style={styles.buttonText}>RESET</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        {password.length > 0 && (
+          <View style={styles.passwordContainer}>
+            <Text
+              style={styles.passwordText}
+              onLongPress={() => {
+                HandleLongPress();
+              }}>
+              {password}
+            </Text>
+            <Text style={{color: returnColor()}}>Long press to copy</Text>
+          </View>
+        )}
+      </SafeAreaView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  passwordText: {color: returnColor(), fontSize: 30},
+  passwordContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderWidth: 1,
+    marginHorizontal: 10,
+    minHeight: 100,
+    borderColor: returnColor(),
+    borderRadius: 10,
   },
-  sectionTitle: {
-    fontSize: 24,
+  buttons: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginVertical: 20,
+  },
+  generateButton: {
+    borderWidth: 1,
+    borderColor: returnColor(),
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    flex: 1,
+    backgroundColor: 'green',
+    alignItems: 'center',
+    justifyContent: 'center',
+    maxWidth: 150,
+  },
+  buttonText: {color: 'white', fontSize: 20, textAlign: 'center'},
+  resetButton: {
+    borderWidth: 1,
+    borderColor: returnColor(),
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    backgroundColor: 'grey',
+    minWidth: 150,
+  },
+  headingText: {
+    fontSize: 30,
     fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 20,
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  whiteText: {
+    color: 'white',
   },
-  highlight: {
-    fontWeight: '700',
+  blackText: {
+    color: 'black',
+  },
+  passwordLengthInputBox: {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: returnColor(),
+    width: 100,
+    borderRadius: 5,
+    paddingHorizontal: 5,
+    color: returnColor(),
+  },
+  inputField: {
+    marginHorizontal: 10,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginVertical: 10,
   },
 });
-
-export default App;
