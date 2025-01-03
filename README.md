@@ -1,3 +1,5 @@
+###Password Generator
+
 This is a react-native based password generator application. The application is designed to generated secure phrases that can be used as passwords based on the requirements of the user such as :-
 1. Variable length of the phrase
 2. Inclusion of capital letters in the phrase
